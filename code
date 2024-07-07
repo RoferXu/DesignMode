@@ -1,0 +1,900 @@
+//Singleton Pattern单例模式
+public class Singleton {
+    private static Singleton instance;
+    
+    private Singleton() {}
+    
+    public static Singleton getInstance() {
+        if (instance == null) {
+            instance = new Singleton();
+        }
+        return instance;
+    }
+}
+
+//Factory Method Pattern工厂方法模式
+public abstract class Product {
+    public abstract void use();
+}
+
+public class ConcreteProduct extends Product {
+    public void use() {
+        System.out.println("Using ConcreteProduct");
+    }
+}
+
+public abstract class Creator {
+    public abstract Product factoryMethod();
+}
+
+public class ConcreteCreator extends Creator {
+    public Product factoryMethod() {
+        return new ConcreteProduct();
+    }
+}
+
+//Abstract Factory Pattern抽象工厂模式
+public interface AbstractFactory {
+    ProductA createProductA();
+    ProductB createProductB();
+}
+
+public class ConcreteFactory1 implements AbstractFactory {
+    public ProductA createProductA() {
+        return new ConcreteProductA1();
+    }
+    public ProductB createProductB() {
+        return new ConcreteProductB1();
+    }
+}
+
+public interface ProductA {}
+public interface ProductB {}
+
+public class ConcreteProductA1 implements ProductA {}
+public class ConcreteProductB1 implements ProductB {}
+
+
+//Builder Pattern建造者模式
+public class Product {
+    private String partA;
+    private String partB;
+
+    public void setPartA(String partA) { this.partA = partA; }
+    public void setPartB(String partB) { this.partB = partB; }
+}
+
+public abstract class Builder {
+    protected Product product = new Product();
+    public abstract void buildPartA();
+    public abstract void buildPartB();
+    public Product getResult() { return product; }
+}
+
+public class ConcreteBuilder extends Builder {
+    public void buildPartA() { product.setPartA("PartA"); }
+    public void buildPartB() { product.setPartB("PartB"); }
+}
+
+public class Director {
+    private Builder builder;
+    public void setBuilder(Builder builder) { this.builder = builder; }
+    public Product construct() {
+        builder.buildPartA();
+        builder.buildPartB();
+        return builder.getResult();
+    }
+}
+
+
+//Prototype Pattern原型模式
+public class Prototype implements Cloneable {
+    public Prototype clone() throws CloneNotSupportedException {
+        return (Prototype) super.clone();
+    }
+}
+
+
+//Adapter Pattern适配器模式
+public interface Target {
+    void request();
+}
+
+public class Adaptee {
+    public void specificRequest() {
+        System.out.println("Called specificRequest");
+    }
+}
+
+public class Adapter implements Target {
+    private Adaptee adaptee;
+    public Adapter(Adaptee adaptee) {
+        this.adaptee = adaptee;
+    }
+    public void request() {
+        adaptee.specificRequest();
+    }
+}
+
+//Bridge Pattern桥接模式
+public abstract class Abstraction {
+    protected Implementor implementor;
+    protected Abstraction(Implementor implementor) {
+        this.implementor = implementor;
+    }
+    public abstract void operation();
+}
+
+public class RefinedAbstraction extends Abstraction {
+    public RefinedAbstraction(Implementor implementor) {
+        super(implementor);
+    }
+    public void operation() {
+        implementor.operationImpl();
+    }
+}
+
+public interface Implementor {
+    void operationImpl();
+}
+
+public class ConcreteImplementorA implements Implementor {
+    public void operationImpl() {
+        System.out.println("ConcreteImplementorA operation");
+    }
+}
+
+
+//Composite Pattern组合模式
+public abstract class Component {
+    public void add(Component c) {}
+    public void remove(Component c) {}
+    public Component getChild(int i) { return null; }
+    public abstract void operation();
+}
+
+public class Leaf extends Component {
+    public void operation() {
+        System.out.println("Leaf operation");
+    }
+}
+
+public class Composite extends Component {
+    private List<Component> children = new ArrayList<>();
+
+    public void add(Component c) {
+        children.add(c);
+    }
+
+    public void remove(Component c) {
+        children.remove(c);
+    }
+
+    public Component getChild(int i) {
+        return children.get(i);
+    }
+
+    public void operation() {
+        for (Component child : children) {
+            child.operation();
+        }
+    }
+}
+
+//Decorator Pattern装饰器模式
+public interface Component {
+    void operation();
+}
+
+public class ConcreteComponent implements Component {
+    public void operation() {
+        System.out.println("ConcreteComponent operation");
+    }
+}
+
+public abstract class Decorator implements Component {
+    protected Component component;
+    public Decorator(Component component) {
+        this.component = component;
+    }
+    public void operation() {
+        component.operation();
+    }
+}
+
+public class ConcreteDecorator extends Decorator {
+    public ConcreteDecorator(Component component) {
+        super(component);
+    }
+    public void operation() {
+        super.operation();
+        addedBehavior();
+    }
+    public void addedBehavior() {
+        System.out.println("ConcreteDecorator addedBehavior");
+    }
+}
+
+
+//Facade Pattern外观模式
+public class Subsystem1 {
+    public void operation1() {
+        System.out.println("Subsystem1 operation1");
+    }
+}
+
+public class Subsystem2 {
+    public void operation2() {
+        System.out.println("Subsystem2 operation2");
+    }
+}
+
+public class Facade {
+    private Subsystem1 subsystem1 = new Subsystem1();
+    private Subsystem2 subsystem2 = new Subsystem2();
+
+    public void operation() {
+        subsystem1.operation1();
+        subsystem2.operation2();
+    }
+}
+
+
+//Flyweight Pattern享元模式
+import java.util.HashMap;
+import java.util.Map;
+
+public interface Flyweight {
+    void operation(String extrinsicState);
+}
+
+public class ConcreteFlyweight implements Flyweight {
+    private String intrinsicState;
+
+    public ConcreteFlyweight(String intrinsicState) {
+        this.intrinsicState = intrinsicState;
+    }
+
+    public void operation(String extrinsicState) {
+        System.out.println("IntrinsicState: " + intrinsicState + ", ExtrinsicState: " + extrinsicState);
+    }
+}
+
+public class FlyweightFactory {
+    private Map<String, Flyweight> flyweights = new HashMap<>();
+
+    public Flyweight getFlyweight(String key) {
+        if (!flyweights.containsKey(key)) {
+            flyweights.put(key, new ConcreteFlyweight(key));
+        }
+        return flyweights.get(key);
+    }
+}
+
+
+//Proxy Pattern代理模式
+public interface Subject {
+    void request();
+}
+
+public class RealSubject implements Subject {
+    public void request() {
+        System.out.println("RealSubject request");
+    }
+}
+
+public class Proxy implements Subject {
+    private RealSubject realSubject;
+
+    public Proxy() {
+        this.realSubject = new RealSubject();
+    }
+
+    public void request() {
+        System.out.println("Proxy request");
+        realSubject.request();
+    }
+}
+
+//Chain of Responsibility Pattern职责链模式
+abstract class Handler {
+    protected Handler successor;
+
+    public void setSuccessor(Handler successor) {
+        this.successor = successor;
+    }
+
+    public abstract void handleRequest(int request);
+}
+
+class ConcreteHandler1 extends Handler {
+    public void handleRequest(int request) {
+        if (request < 10) {
+            System.out.println("ConcreteHandler1 handled request " + request);
+        } else if (successor != null) {
+            successor.handleRequest(request);
+        }
+    }
+}
+
+class ConcreteHandler2 extends Handler {
+    public void handleRequest(int request) {
+        if (request >= 10 && request < 20) {
+            System.out.println("ConcreteHandler2 handled request " + request);
+        } else if (successor != null) {
+            successor.handleRequest(request);
+        }
+    }
+}
+
+public class ChainOfResponsibilityDemo {
+    public static void main(String[] args) {
+        Handler handler1 = new ConcreteHandler1();
+        Handler handler2 = new ConcreteHandler2();
+        handler1.setSuccessor(handler2);
+
+        handler1.handleRequest(5);
+        handler1.handleRequest(15);
+        handler1.handleRequest(25);
+    }
+}
+
+
+//Command Pattern命令模式
+interface Command {
+    void execute();
+}
+
+class Light {
+    public void on() {
+        System.out.println("Light is on");
+    }
+    public void off() {
+        System.out.println("Light is off");
+    }
+}
+
+class LightOnCommand implements Command {
+    private Light light;
+    public LightOnCommand(Light light) {
+        this.light = light;
+    }
+    public void execute() {
+        light.on();
+    }
+}
+
+class LightOffCommand implements Command {
+    private Light light;
+    public LightOffCommand(Light light) {
+        this.light = light;
+    }
+    public void execute() {
+        light.off();
+    }
+}
+
+class RemoteControl {
+    private Command command;
+    public void setCommand(Command command) {
+        this.command = command;
+    }
+    public void pressButton() {
+        command.execute();
+    }
+}
+
+public class CommandPatternDemo {
+    public static void main(String[] args) {
+        Light light = new Light();
+        Command lightOn = new LightOnCommand(light);
+        Command lightOff = new LightOffCommand(light);
+
+        RemoteControl remote = new RemoteControl();
+        remote.setCommand(lightOn);
+        remote.pressButton();
+        remote.setCommand(lightOff);
+        remote.pressButton();
+    }
+}
+
+//Interpreter Pattern解释器模式
+interface Expression {
+    boolean interpret(String context);
+}
+
+class TerminalExpression implements Expression {
+    private String data;
+
+    public TerminalExpression(String data) {
+        this.data = data;
+    }
+
+    public boolean interpret(String context) {
+        return context.contains(data);
+    }
+}
+
+class OrExpression implements Expression {
+    private Expression expr1;
+    private Expression expr2;
+
+    public OrExpression(Expression expr1, Expression expr2) {
+        this.expr1 = expr1;
+        this.expr2 = expr2;
+    }
+
+    public boolean interpret(String context) {
+        return expr1.interpret(context) || expr2.interpret(context);
+    }
+}
+
+public class InterpreterPatternDemo {
+    public static void main(String[] args) {
+        Expression isMale = new TerminalExpression("Male");
+        Expression isFemale = new TerminalExpression("Female");
+
+        Expression isPerson = new OrExpression(isMale, isFemale);
+
+        System.out.println("Is John a person? " + isPerson.interpret("John is a Male"));
+    }
+}
+
+//Iterator Pattern迭代器模式
+interface Iterator {
+    boolean hasNext();
+    Object next();
+}
+
+interface Container {
+    Iterator getIterator();
+}
+
+class NameRepository implements Container {
+    public String names[] = {"Robert", "John", "Julie", "Lora"};
+
+    public Iterator getIterator() {
+        return new NameIterator();
+    }
+
+    private class NameIterator implements Iterator {
+        int index;
+
+        public boolean hasNext() {
+            return index < names.length;
+        }
+
+        public Object next() {
+            if (this.hasNext()) {
+                return names[index++];
+            }
+            return null;
+        }
+    }
+}
+
+public class IteratorPatternDemo {
+    public static void main(String[] args) {
+        NameRepository namesRepository = new NameRepository();
+
+        for (Iterator iter = namesRepository.getIterator(); iter.hasNext(); ) {
+            String name = (String) iter.next();
+            System.out.println("Name: " + name);
+        }
+    }
+}
+
+//Mediator Pattern中介者模式
+class ChatRoom {
+    public static void showMessage(User user, String message) {
+        System.out.println(user.getName() + ": " + message);
+    }
+}
+
+class User {
+    private String name;
+
+    public User(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void sendMessage(String message) {
+        ChatRoom.showMessage(this, message);
+    }
+}
+
+public class MediatorPatternDemo {
+    public static void main(String[] args) {
+        User john = new User("John");
+        User jane = new User("Jane");
+
+        john.sendMessage("Hello, Jane!");
+        jane.sendMessage("Hi, John!");
+    }
+}
+
+
+//Memento Pattern备忘录模式
+class Memento {
+    private String state;
+
+    public Memento(String state) {
+        this.state = state;
+    }
+
+    public String getState() {
+        return state;
+    }
+}
+
+class Originator {
+    private String state;
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public Memento saveStateToMemento() {
+        return new Memento(state);
+    }
+
+    public void getStateFromMemento(Memento memento) {
+        state = memento.getState();
+    }
+}
+
+class CareTaker {
+    private List<Memento> mementoList = new ArrayList<>();
+
+    public void add(Memento state) {
+        mementoList.add(state);
+    }
+
+    public Memento get(int index) {
+        return mementoList.get(index);
+    }
+}
+
+public class MementoPatternDemo {
+    public static void main(String[] args) {
+        Originator originator = new Originator();
+        CareTaker careTaker = new CareTaker();
+
+        originator.setState("State #1");
+        originator.setState("State #2");
+        careTaker.add(originator.saveStateToMemento());
+
+        originator.setState("State #3");
+        careTaker.add(originator.saveStateToMemento());
+
+        originator.setState("State #4");
+        System.out.println("Current State: " + originator.getState());
+
+        originator.getStateFromMemento(careTaker.get(0));
+        System.out.println("First saved State: " + originator.getState());
+        originator.getStateFromMemento(careTaker.get(1));
+        System.out.println("Second saved State: " + originator.getState());
+    }
+}
+
+
+//Observer Pattern观察者模式
+import java.util.ArrayList;
+import java.util.List;
+
+abstract class Observer {
+    protected Subject subject;
+    public abstract void update();
+}
+
+class Subject {
+    private List<Observer> observers = new ArrayList<>();
+    private int state;
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+        notifyAllObservers();
+    }
+
+    public void attach(Observer observer) {
+        observers.add(observer);
+    }
+
+    public void notifyAllObservers() {
+        for (Observer observer : observers) {
+            observer.update();
+        }
+    }
+}
+
+class BinaryObserver extends Observer {
+    public BinaryObserver(Subject subject) {
+        this.subject = subject;
+        this.subject.attach(this);
+    }
+
+    public```java
+    void update() {
+        System.out.println("Binary String: " + Integer.toBinaryString(subject.getState()));
+    }
+}
+
+class OctalObserver extends Observer {
+    public OctalObserver(Subject subject) {
+        this.subject = subject;
+        this.subject.attach(this);
+    }
+
+    public void update() {
+        System.out.println("Octal String: " + Integer.toOctalString(subject.getState()));
+    }
+}
+
+class HexaObserver extends Observer {
+    public HexaObserver(Subject subject) {
+        this.subject = subject;
+        this.subject.attach(this);
+    }
+
+    public void update() {
+        System.out.println("Hex String: " + Integer.toHexString(subject.getState()));
+    }
+}
+
+public class ObserverPatternDemo {
+    public static void main(String[] args) {
+        Subject subject = new Subject();
+
+        new HexaObserver(subject);
+        new OctalObserver(subject);
+        new BinaryObserver(subject);
+
+        System.out.println("First state change: 15");
+        subject.setState(15);
+        System.out.println("Second state change: 10");
+        subject.setState(10);
+    }
+}
+
+
+//State Pattern状态模式
+interface State {
+    void doAction(Context context);
+}
+
+class StartState implements State {
+    public void doAction(Context context) {
+        System.out.println("Player is in start state");
+        context.setState(this);
+    }
+
+    public String toString() {
+        return "Start State";
+    }
+}
+
+class StopState implements State {
+    public void doAction(Context context) {
+        System.out.println("Player is in stop state");
+        context.setState(this);
+    }
+
+    public String toString() {
+        return "Stop State";
+    }
+}
+
+class Context {
+    private State state;
+
+    public Context() {
+        state = null;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    public State getState() {
+        return state;
+    }
+}
+
+public class StatePatternDemo {
+    public static void main(String[] args) {
+        Context context = new Context();
+
+        StartState startState = new StartState();
+        startState.doAction(context);
+
+        System.out.println(context.getState().toString());
+
+        StopState stopState = new StopState();
+        stopState.doAction(context);
+
+        System.out.println(context.getState().toString());
+    }
+}
+
+//Strategy Pattern策略模式
+interface Strategy {
+    int doOperation(int num1, int num2);
+}
+
+class OperationAdd implements Strategy {
+    public int doOperation(int num1, int num2) {
+        return num1 + num2;
+    }
+}
+
+class OperationSubtract implements Strategy {
+    public int doOperation(int num1, int num2) {
+        return num1 - num2;
+    }
+}
+
+class OperationMultiply implements Strategy {
+    public int doOperation(int num1, int num2) {
+        return num1 * num2;
+    }
+}
+
+class Context {
+    private Strategy strategy;
+
+    public Context(Strategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public int executeStrategy(int num1, int num2) {
+        return strategy.doOperation(num1, num2);
+    }
+}
+
+public class StrategyPatternDemo {
+    public static void main(String[] args) {
+        Context context = new Context(new OperationAdd());
+        System.out.println("10 + 5 = " + context.executeStrategy(10, 5));
+
+        context = new Context(new OperationSubtract());
+        System.out.println("10 - 5 = " + context.executeStrategy(10, 5));
+
+        context = new Context(new OperationMultiply());
+        System.out.println("10 * 5 = " + context.executeStrategy(10, 5));
+    }
+}
+
+//Template Method Pattern模版方法模式
+abstract class Game {
+    abstract void initialize();
+    abstract void startPlay();
+    abstract void endPlay();
+
+    //模板方法
+    public final void play() {
+        initialize();
+        startPlay();
+        endPlay();
+    }
+}
+
+class Cricket extends Game {
+    void initialize() {
+        System.out.println("Cricket Game Initialized! Start playing.");
+    }
+
+    void startPlay() {
+        System.out.println("Cricket Game Started. Enjoy the game!");
+    }
+
+    void endPlay() {
+        System.out.println("Cricket Game Finished!");
+    }
+}
+
+class Football extends Game {
+    void initialize() {
+        System.out.println("Football Game Initialized! Start playing.");
+    }
+
+    void startPlay() {
+        System.out.println("Football Game Started. Enjoy the game!");
+    }
+
+    void endPlay() {
+        System.out.println("Football Game Finished!");
+    }
+}
+
+public class TemplatePatternDemo {
+    public static void main(String[] args) {
+        Game game = new Cricket();
+        game.play();
+        System.out.println();
+        game = new Football();
+        game.play();
+    }
+}
+
+
+//Visitor Pattern访问者模式
+interface ComputerPart {
+    void accept(ComputerPartVisitor computerPartVisitor);
+}
+
+class Keyboard implements ComputerPart {
+    public void accept(ComputerPartVisitor computerPartVisitor) {
+        computerPartVisitor.visit(this);
+    }
+}
+
+class Monitor implements ComputerPart {
+    public void accept(ComputerPartVisitor computerPartVisitor) {
+        computerPartVisitor.visit(this);
+    }
+}
+
+class Mouse implements ComputerPart {
+    public void accept(ComputerPartVisitor computerPartVisitor) {
+        computerPartVisitor.visit(this);
+    }
+}
+
+class Computer implements ComputerPart {
+    ComputerPart[] parts;
+
+    public Computer() {
+        parts = new ComputerPart[]{new Mouse(), new Keyboard(), new Monitor()};
+    }
+
+    public void accept(ComputerPartVisitor computerPartVisitor) {
+        for (int i = 0; i < parts.length; i++) {
+            parts[i].accept(computerPartVisitor);
+        }
+        computerPartVisitor.visit(this);
+    }
+}
+
+interface ComputerPartVisitor {
+    void visit(Computer computer);
+    void visit(Mouse mouse);
+    void visit(Keyboard keyboard);
+    void visit(Monitor monitor);
+}
+
+class ComputerPartDisplayVisitor implements ComputerPartVisitor {
+    public void visit(Computer computer) {
+        System.out.println("Displaying Computer.");
+    }
+
+    public void visit(Mouse mouse) {
+        System.out.println("Displaying Mouse.");
+    }
+
+    public void visit(Keyboard keyboard) {
+        System.out.println("Displaying Keyboard.");
+    }
+
+    public void visit(Monitor monitor) {
+        System.out.println("Displaying Monitor.");
+    }
+}
+
+public class VisitorPatternDemo {
+    public static void main(String[] args) {
+        ComputerPart computer = new Computer();
+        computer.accept(new ComputerPartDisplayVisitor());
+    }
+}
